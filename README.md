@@ -9,4 +9,4 @@ Technologies:
 
 - Bootstrap
 
-You can learn basicly Spring Security consept, CRUD operations, HTTP methods. 
+You can learn basicly Spring Security consept, CRUD operations, HTTP methods, authentication, how to init DB, custom error pages ...
