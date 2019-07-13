@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Anasayfa</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+        p{
+            margin-left: 16px;
+            margin-top: 16px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">Anasayfa</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+            </ul>
+            <form style="margin-left: 16px" class="form-inline my-2 my-lg-0" form-method="post" th:action="@{/logout}">
+                <button sec:authorize="isAuthenticated()" class="btn btn-outline-danger my-2 my-sm-0 btn-sm" type="submit">Logout</button>
+            </form>
+        </div>
+    </nav>
+
+    <div style="margin-left: 16px" sec:authorize="isAuthenticated()">
+        <h1>Hoşgeldin : <td th:text="${user.getUsername()}" /></h1><br>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                <div class="list-group">
+                    <a href="#" class="list-group-item list-group-item-info disabled" ><h2>Listeler</h2></a>
+                    <a href="#" th:each="list : ${user.getLists()}" th:text="${list.getItemListname()}" th:href="${'/show/list/' + list.getId()}" class="list-group-item"></a>
+
+                    <form style="margin-top: 8px;" th:action="@{/newItemList}" th:object="${newList}" method="POST">
+                        <div class="form-group">
+                            <label>Yeni Liste Oluştur</label>
+                            <input type="text" th:field="*{itemListname}" class="form-control" placeholder="Yeni Liste" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Yeni Liste</button>
+                    </form>
+
+                </div>
+            </div>
+            <div class="col-sm">
+                <div th:if="${list}">
+                    <div class="list-group">
+                        <a href="#" class="list-group-item list-group-item-info disabled" ><h3><td th:text="${list.getItemListname()}" /></h3></a>
+                        <table class="table">
+                            <tr>
+                                <th>İçerik</th>
+                                <th>Bitiş Tarihi</th>
+                                <th>Gör</th>
+                                <th>Sil</th>
+                            </tr>
+                            <tr th:each="item : ${list.getItemList()}">
+                                <td th:text="${item.getIcerik()}"/>
+                                <td th:text="${item.getDeadline()}"/>
+                                <div th:if="${!item.getStatus()}">
+                                    <td><a class="btn disabled" href="#">View</a></td>
+                                    <td><a th:href="${'/delete/item/' + item.getId() + '/' + list.getId()}">Sil</a></td>
+                                </div>
+                                <div th:if="${item.getStatus()}">
+                                    <td><a th:href="${'/incele/item/' + item.getId()+ '/'  + list.getId()}">View</a></td>
+                                    <td><a th:href="${'/delete/item/' + item.getId() + '/' + list.getId()}">Sil</a></td>
+                                </div>
+                            </tr>
+                        </table>
+                        <div th:if="${tip} == null ">
+                            <form style="margin-top: 8px;"  th:action="@{/newItem/}  + ${list.getId()} " th:object="${newItem}" method="POST">
+                                <div class="form-group">
+                                    <label>Yeni Item Oluştur</label>
+                                    <input type="text" th:field="*{icerik}" class="form-control" placeholder="Icerik" required>
+                                    <input type="date" th:field="*{deadline}" class="form-control" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Yeni Item</button>
+                            </form>
+                        </div>
+                        <div th:if="${tip}">
+                            <form style="margin-top: 8px;" th:action="@{/incele/kaydet/}  + ${newItem.getId()} + @{/} + ${list.getId()}  " th:object="${newItem}" method="post">
+                                <div class="form-group">
+                                    <label>İtemi düzenle</label>
+                                    <input type="text" th:field="*{icerik}" class="form-control" required>
+                                    <input type="date" th:field="*{deadline}" class="form-control" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Düzenle</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+</body>
+</html>
